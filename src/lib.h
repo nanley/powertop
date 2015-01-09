@@ -68,6 +68,7 @@ extern string read_sysfs_string(const char *format, const char *param);
 
 extern void format_watts(double W, char *buffer, unsigned int len);
 
+extern const char *upci_id_to_name(struct udev_device* dev, char* buffer);
 extern char *pci_id_to_name(uint16_t vendor, uint16_t device, char *buffer, int len);
 extern void end_pci_access(void);
 

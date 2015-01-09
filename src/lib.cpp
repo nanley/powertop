@@ -314,6 +314,33 @@ void cleanup_udev()
 	}
 }
 
+const char *upci_id_to_name(struct udev_device* dev, char* buffer)
+{
+	const char *uvendor = udev_device_get_sysattr_value(dev, "vendor");
+	const char *udevice = udev_device_get_sysattr_value(dev, "device");
+	uint16_t vendor = stoul(string(uvendor), NULL, 16);
+	uint16_t device = stoul(string(udevice), NULL, 16);
+	char modalias[64];
+	sprintf(modalias, "pci:v%08Xd%08X*", vendor, device);
+	const char *key1 = "ID_VENDOR_FROM_DATABASE";
+	const char *key2 = "ID_MODEL_FROM_DATABASE";
+
+	struct udev_hwdb *hwdb = udev_hwdb_new(udev_device_get_udev(dev));
+	struct udev_list_entry *entry;
+	udev_list_entry_foreach(entry, udev_hwdb_get_properties_list_entry(hwdb, modalias, 0))
+		if (strcmp(udev_list_entry_get_name(entry), key1) == 0)
+			uvendor =  udev_list_entry_get_value(entry);
+		else if (strcmp(udev_list_entry_get_name(entry), key2) == 0)
+			udevice =  udev_list_entry_get_value(entry);
+
+	if (uvendor && udevice) {
+		sprintf(buffer, "%s %s", uvendor, udevice);
+		return buffer;
+	}
+
+	return NULL;
+}
+
 #ifndef HAVE_NO_PCI
 static struct pci_access *pci_access;
 

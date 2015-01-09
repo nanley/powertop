@@ -42,16 +42,11 @@ runtime_tunable::runtime_tunable(struct udev_device* udev_device) :
 	const char *dev = udev_device_get_sysname(udev_device);
 
 	/* Give more accurate descriptions for PCI devices */
+	char devname[4096];
 	if (strcmp(bus, "pci") == 0) {
-		const char *uvendor = udev_device_get_sysattr_value(udev_device, "vendor");
-		const char *udevice = udev_device_get_sysattr_value(udev_device, "device");
-		uint16_t vendor = stoul(string(uvendor), NULL, 16);
-		uint16_t device = stoul(string(udevice), NULL, 16);
+		if (upci_id_to_name(udev_device, devname))
+			dev = devname;
 		bus = "PCI";
-		if (vendor && device) {
-			char filename[4096];
-			dev = pci_id_to_name(vendor, device, filename, 4095);
-		}
 	}
 
 	if (!udevice_has_runtime_pm(udev_device))
