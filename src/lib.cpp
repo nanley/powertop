@@ -291,6 +291,29 @@ void format_watts(double W, char *buffer, unsigned int len)
 	align_string(buffer, len, len);
 }
 
+static struct udev *udev_cxt = NULL;
+
+struct udev * get_udev()
+{
+	if (udev_cxt == NULL) {
+		udev_cxt = udev_new();
+		if (udev_cxt == NULL) {
+			printf("Couldn't create udev\n");
+			exit(EXIT_FAILURE);
+		}
+	}
+
+	return udev_cxt;
+}
+
+void cleanup_udev()
+{
+	if (udev_cxt != NULL) {
+		udev_unref(udev_cxt);
+		udev_cxt = NULL;
+	}
+}
+
 #ifndef HAVE_NO_PCI
 static struct pci_access *pci_access;
 
@@ -435,6 +458,37 @@ char *pretty_print(const char *str, char *buf, int len)
 int equals(double a, double b)
 {
 	return fabs(a - b) <= std::numeric_limits<double>::epsilon();
+}
+
+void process_subsystem(const char *subsystem, callback fn, int num_attr, ...)
+{
+	/* Find devices in subsystem with given attributes */
+	struct udev_enumerate *enumerate = udev_enumerate_new(get_udev());
+	udev_enumerate_add_match_subsystem(enumerate, subsystem);
+	va_list args;
+	va_start (args, num_attr);
+	while (num_attr--) {
+		const char *attr = va_arg(args, const char*);
+		const char *attr_val = va_arg(args, const char*);
+		if (*attr == '+')
+			udev_enumerate_add_match_sysattr(enumerate, &attr[1], attr_val);
+		else if (*attr == '-')
+			udev_enumerate_add_nomatch_sysattr(enumerate, &attr[1], attr_val);
+		else {
+			fprintf (stderr, "Bad format of attribute\n");
+			exit(1);
+		}
+	}
+	va_end (args);
+	udev_enumerate_scan_devices(enumerate);
+
+	/* Run callback on each device */
+	struct udev_list_entry *dev_entry;
+	udev_list_entry_foreach(dev_entry, udev_enumerate_get_list_entry(enumerate))
+		fn(udev_list_entry_get_name(dev_entry));
+
+	/* Cleanup */
+	udev_enumerate_unref(enumerate);
 }
 
 void process_directory(const char *d_name, callback fn)

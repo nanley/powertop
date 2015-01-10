@@ -379,6 +379,7 @@ void clean_shutdown()
 	clear_all_devices();
 	clear_all_devfreq();
 	clear_all_cpus();
+	cleanup_udev();
 
 	return;
 }

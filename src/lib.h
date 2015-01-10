@@ -28,6 +28,7 @@
 #include <libintl.h>
 #include <stdint.h>
 #include <stdlib.h>
+#include <libudev.h>
 
 /* Include only for Automake builds */
 #ifdef HAVE_CONFIG_H
@@ -70,6 +71,8 @@ extern void format_watts(double W, char *buffer, unsigned int len);
 extern char *pci_id_to_name(uint16_t vendor, uint16_t device, char *buffer, int len);
 extern void end_pci_access(void);
 
+extern struct udev * get_udev();
+extern void cleanup_udev();
 
 extern char *fmt_prefix(double n, char *buf);
 extern char *pretty_print(const char *str, char *buf, int len);
@@ -77,6 +80,7 @@ extern int equals(double a, double b);
 
 typedef void (*callback)(const char*);
 extern void process_directory(const char *d_name, callback fn);
+extern void process_subsystem(const char *subsystem, callback fn, int num_attr, ...);
 extern int utf_ok;
 extern int get_user_input(char *buf, unsigned sz);
 extern int read_msr(int cpu, uint64_t offset, uint64_t *value);
