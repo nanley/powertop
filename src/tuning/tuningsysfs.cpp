@@ -115,15 +115,21 @@ void add_sysfs_tunable(const char *str, const char *_sysfs_path, const char *_ta
 
 static void add_sata_tunables_callback(const char *d_name)
 {
+	struct udev_device *dev = udev_device_new_from_syspath(get_udev(), d_name);
+	const char *dev_name = udev_device_get_sysname(dev);
 	char filename[4096];
 	char msg[4096];
 
-	sprintf(filename, "/sys/class/scsi_host/%s/link_power_management_policy", d_name);
-	sprintf(msg, _("Enable SATA link power management for %s"), d_name);
+	sprintf(filename, "%s/link_power_management_policy", d_name);
+	sprintf(msg, _("Enable SATA link power management for %s"), dev_name);
 	add_sysfs_tunable(msg, filename,"min_power");
+
+	/* Cleanup */
+	udev_device_unref(dev);
 }
 
 void add_sata_tunables(void)
 {
-	process_directory("/sys/class/scsi_host", add_sata_tunables_callback);
+	process_subsystem("scsi_host", add_sata_tunables_callback, 1,
+					  "+link_power_management_policy", NULL);
 }

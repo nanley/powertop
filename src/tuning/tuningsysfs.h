@@ -32,6 +32,7 @@
 using namespace std;
 
 class sysfs_tunable : public tunable {
+	struct udev_device *tun_dev;
 	char sysfs_path[4096];
 	char target_value[4096];
 	char bad_value[4096];
