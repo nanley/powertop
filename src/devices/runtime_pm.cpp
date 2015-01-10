@@ -29,7 +29,6 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <sys/types.h>
-#include <dirent.h>
 
 #include "../parameters/parameters.h"
 #include "../lib.h"
@@ -178,85 +177,42 @@ int device_has_runtime_pm(const char *sysfs_path)
 	return 0;
 }
 
-static void do_bus(const char *bus)
+static void do_bus(const char *filename)
 {
 	/* /sys/bus/pci/devices/0000\:00\:1f.0/power/runtime_suspended_time */
+	struct udev_device *udevice = udev_device_new_from_syspath(get_udev(), filename);
+	const char * name = udev_device_get_sysname(udevice);
+	const char * bus = udev_device_get_subsystem(udevice);
+	runtime_pmdevice *dev = new runtime_pmdevice(name, filename);
 
-	struct dirent *entry;
-	DIR *dir;
-	char filename[4096];
+	if (strcmp(bus, "i2c") == 0) {
+		char dev_name[4096];
+		const char *new_dev = udev_device_get_sysattr_value(udevice, "new_device");
+		const char *devname = udev_device_get_sysattr_value(udevice, "name");
+		sprintf(dev_name, _("I2C Device: %s"), devname);
+		sprintf(dev_name, _("I2C %s (%s): %s"), (new_dev ? _("Adapter") : _("Device")), name, devname);
+		dev->set_human_name(dev_name);
+	}
 
-	sprintf(filename, "/sys/bus/%s/devices/", bus);
-	dir = opendir(filename);
-	if (!dir)
-		return;
-	while (1) {
-		ifstream file;
-		class runtime_pmdevice *dev;
-		entry = readdir(dir);
+	if (strcmp(bus, "pci") == 0) {
+		char dev_name[4096];
+		char devname[4096];
 
-		if (!entry)
-			break;
-		if (entry->d_name[0] == '.')
-			continue;
-
-		dev = new class runtime_pmdevice(entry->d_name, filename);
-
-		if (strcmp(bus, "i2c") == 0) {
-			string devname;
-			char dev_name[4096];
-			bool is_adapter = false;
-
-			sprintf(filename, "/sys/bus/%s/devices/%s/new_device", bus, entry->d_name);
-			if (access(filename, W_OK) == 0)
-				is_adapter = true;
-
-			sprintf(filename, "/sys/bus/%s/devices/%s/name", bus, entry->d_name);
-			file.open(filename, ios::in);
-			if (file) {
-				getline(file, devname);
-				file.close();
-			}
-
-			sprintf(dev_name, _("I2C %s (%s): %s"), (is_adapter ? _("Adapter") : _("Device")), entry->d_name, devname.c_str());
+		if (upci_id_to_name(udevice, devname)) {
+			sprintf(dev_name, _("PCI Device: %s"), devname);
 			dev->set_human_name(dev_name);
 		}
-
-		if (strcmp(bus, "pci") == 0) {
-			uint16_t vendor = 0, device = 0;
-
-			sprintf(filename, "/sys/bus/%s/devices/%s/vendor", bus, entry->d_name);
-
-			file.open(filename, ios::in);
-			if (file) {
-				file >> hex >> vendor;
-				file.close();
-			}
-
-
-			sprintf(filename, "/sys/bus/%s/devices/%s/device", bus, entry->d_name);
-			file.open(filename, ios::in);
-			if (file) {
-				file >> hex >> device;
-				file.close();
-			}
-
-			if (vendor && device) {
-				char devname[4096];
-				sprintf(devname, _("PCI Device: %s"),
-					pci_id_to_name(vendor, device, filename, 4095));
-				dev->set_human_name(devname);
-			}
-		}
-		all_devices.push_back(dev);
 	}
-	closedir(dir);
+	all_devices.push_back(dev);
+
+	/* Cleanup */
+	udev_device_unref(udevice);
 }
 
 void create_all_runtime_pm_devices(void)
 {
-	do_bus("pci");
-	do_bus("spi");
-	do_bus("platform");
-	do_bus("i2c");
+	process_subsystem("pci", do_bus, 0);
+	process_subsystem("spi", do_bus, 0);
+	process_subsystem("platform", do_bus, 0);
+	process_subsystem("i2c", do_bus, 0);
 }
