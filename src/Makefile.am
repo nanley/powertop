@@ -133,6 +133,7 @@ powertop_CXXFLAGS = \
 	$(GLIB2_CFLAGS) \
 	$(LIBNL_CFLAGS) \
 	$(NCURSES_CFLAGS) \
+	$(UDEV_CFLAGS) \
 	$(PCIUTILS_CFLAGS)
 
 
@@ -142,6 +143,7 @@ powertop_CPPFLAGS = \
 	$(LIBNL_CFLAGS) \
 	$(LIBZ_CFLAGS) \
 	$(NCURSES_CFLAGS) \
+	$(UDEV_CFLAGS) \
 	$(PCIUTILS_CFLAGS)
 
 powertop_LDADD = \
@@ -152,6 +154,7 @@ AM_LDFLAGS = \
 	$(LIBS) \
 	$(LIBZ_LIBS) \
 	$(NCURSES_LIBS) \
+	$(UDEV_LIBS) \
 	$(PCIUTILS_LIBS) \
 	$(PTHREAD_LIBS) \
 	$(RESOLV_LIBS)

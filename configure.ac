@@ -54,6 +54,7 @@ AC_CHECK_HEADERS([ \
 	locale.h \
 	malloc.h \
 	ncurses.h \
+	libudev.h \
 	stdint.h \
 	stdlib.h \
 	string.h \
@@ -104,6 +105,10 @@ AC_CHECK_FUNCS([ \
 	strstr \
 	strtoul \
 	strtoull \
+])
+
+PKG_CHECK_MODULES([UDEV], [libudev], [LIBS="$LIBS $udev_LIBS"], [
+		AC_MSG_ERROR([libudev is required but was not found])
 ])
 
 PKG_CHECK_MODULES([NCURSES], [ncursesw ncurses], [LIBS="$LIBS $ncurses_LIBS"], [
