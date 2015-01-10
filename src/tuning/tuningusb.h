@@ -32,9 +32,10 @@
 using namespace std;
 
 class usb_tunable : public tunable {
-	char usb_path[4096];
+	struct udev_device *tun_dev;
 public:
-	usb_tunable(const char *usb_path, const char *path);
+	usb_tunable(struct udev_device *usb_dev);
+	~usb_tunable();
 
 	virtual int good_bad(void);
 
