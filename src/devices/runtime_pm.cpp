@@ -143,6 +143,13 @@ void runtime_pmdevice::set_human_name(char *_name)
 	strcpy(humanname, _name);
 }
 
+int udevice_has_runtime_pm(struct udev_device* udevice)
+{
+	const char *sus_t = udev_device_get_sysattr_value(udevice, "power/runtime_suspended_time");
+	const char *act_t = udev_device_get_sysattr_value(udevice, "power/runtime_active_time");
+	return (sus_t != NULL &&
+			(atoi(sus_t) || (act_t != NULL && atoi(act_t))));
+}
 
 int device_has_runtime_pm(const char *sysfs_path)
 {

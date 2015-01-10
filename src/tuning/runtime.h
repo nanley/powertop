@@ -31,9 +31,11 @@
 using namespace std;
 
 class runtime_tunable : public tunable {
-	char runtime_path[4096];
+	struct udev_device *tun_dev;
 public:
-	runtime_tunable(const char *runtime_path, const char *bus, const char *dev);
+	runtime_tunable(struct udev_device* udev);
+
+	~runtime_tunable(void);
 
 	virtual int good_bad(void);
 
