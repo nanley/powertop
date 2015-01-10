@@ -4,7 +4,6 @@ include $(CLEAR_VARS)
 LOCAL_MODULE_TAGS := debug
 LOCAL_SHARED_LIBRARIES := libstlport \
 			  libnl \
-			  libpci \
 			  libtraceevnet \
 LOCAL_MODULE := powertop  
 

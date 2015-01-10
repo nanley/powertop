@@ -117,11 +117,6 @@ PKG_CHECK_MODULES([NCURSES], [ncursesw ncurses], [LIBS="$LIBS $ncurses_LIBS"], [
 	], [])
 ])
 
-has_libpci=0
-PKG_CHECK_MODULES([PCIUTILS], [libpci],[has_libpci=1], [
-	AC_SEARCH_LIBS([pci_get_dev], [pci],[has_libpci=1], [has_libpci=0])
-])
- 
 
 has_libnl_ver=0
 dnl libnl-2 provides only libnl-2.0.pc file, so we check for separate
@@ -136,16 +131,6 @@ AS_IF([test "$has_libnl_ver" -eq 0], [
 ])
 AS_IF([test "$has_libnl_ver" -gt 1], [
 	AC_DEFINE([HAVE_LIBNL20], [1], [Define if you have libnl-2.0 or higher])
-])
-
-AS_IF([test "$has_libpci" -eq 0], [
-	AC_DEFINE([HAVE_NO_PCI], [1], [Define if pci is not supported])
-        AC_MSG_WARN([
-			************* LIBPCI SUPPORT NOT CONFIGURED**************
-			If you need or want pci support, please install libpci 
-			and re-configure PowerTOP. 
-			*********************************************************
-	])
 ])
 
 AC_SEARCH_LIBS([inet_aton], [resolv], [], [

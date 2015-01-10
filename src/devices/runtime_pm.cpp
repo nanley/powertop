@@ -150,33 +150,6 @@ int udevice_has_runtime_pm(struct udev_device* udevice)
 			(atoi(sus_t) || (act_t != NULL && atoi(act_t))));
 }
 
-int device_has_runtime_pm(const char *sysfs_path)
-{
-	char filename[4096];
-	ifstream file;
-	unsigned long value;
-
-	sprintf(filename, "%s/power/runtime_suspended_time", sysfs_path);
-	file.open(filename, ios::in);
-	if (!file)
-		return 0;
-	file >> value;
-	file.close();
-	if (value)
-		return 1;
-
-	sprintf(filename, "%s/power/runtime_active_time", sysfs_path);
-	file.open(filename, ios::in);
-	if (!file)
-		return 0;
-	file >> value;
-	file.close();
-	if (value)
-		return 1;
-
-	return 0;
-}
-
 static void do_bus(const char *filename)
 {
 	/* /sys/bus/pci/devices/0000\:00\:1f.0/power/runtime_suspended_time */

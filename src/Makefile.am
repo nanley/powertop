@@ -133,8 +133,7 @@ powertop_CXXFLAGS = \
 	$(GLIB2_CFLAGS) \
 	$(LIBNL_CFLAGS) \
 	$(NCURSES_CFLAGS) \
-	$(UDEV_CFLAGS) \
-	$(PCIUTILS_CFLAGS)
+	$(UDEV_CFLAGS)
 
 
 powertop_CPPFLAGS = \
@@ -143,8 +142,7 @@ powertop_CPPFLAGS = \
 	$(LIBNL_CFLAGS) \
 	$(LIBZ_CFLAGS) \
 	$(NCURSES_CFLAGS) \
-	$(UDEV_CFLAGS) \
-	$(PCIUTILS_CFLAGS)
+	$(UDEV_CFLAGS)
 
 powertop_LDADD = \
 	../traceevent/libtraceevnet.la
@@ -155,7 +153,6 @@ AM_LDFLAGS = \
 	$(LIBZ_LIBS) \
 	$(NCURSES_LIBS) \
 	$(UDEV_LIBS) \
-	$(PCIUTILS_LIBS) \
 	$(PTHREAD_LIBS) \
 	$(RESOLV_LIBS)
 

@@ -282,7 +282,6 @@ void make_report(int time, char *workload, int iterations, char *file)
 	learn_parameters(50, 0);
 	save_all_results("saved_results.powertop");
 	save_parameters("saved_parameters.powertop");
-	end_pci_access();
 	exit(0);
 }
 
@@ -475,7 +474,6 @@ int main(int argc, char **argv)
 	if (debug_learning) {
 	        learn_parameters(1000, 1);
 		dump_parameter_bundle();
-		end_pci_access();
 		exit(0);
 	}
 	if (!auto_tune)
@@ -512,7 +510,6 @@ int main(int argc, char **argv)
 	save_parameters("saved_parameters.powertop");
 	learn_parameters(500, 0);
 	save_parameters("saved_parameters.powertop");
-	end_pci_access();
 	clear_tuning();
 	reset_display();
 

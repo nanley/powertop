@@ -20,7 +20,6 @@ development environment.
 
 in addition to that, PowerTOP requires the following components:
 
-pciutils-devel (is only required if you have PCI) 
 ncurses-devel  (required) 
 libnl-devel    (required)
 kernel version => 2.6.38

@@ -37,15 +37,8 @@
 
 #include "lib.h"
 
-#ifndef HAVE_NO_PCI
-extern "C" {
-#include <pci/pci.h>
-}
-#endif
-
 #include <stdio.h>
 #include <stdint.h>
-#include <stdlib.h>
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/types.h>
@@ -340,44 +333,6 @@ const char *upci_id_to_name(struct udev_device* dev, char* buffer)
 
 	return NULL;
 }
-
-#ifndef HAVE_NO_PCI
-static struct pci_access *pci_access;
-
-char *pci_id_to_name(uint16_t vendor, uint16_t device, char *buffer, int len)
-{
-	char *ret;
-
-	buffer[0] = 0;
-
-	if (!pci_access) {
-		pci_access = pci_alloc();
-		pci_init(pci_access);
-	}
-
-	ret = pci_lookup_name(pci_access, buffer, len, PCI_LOOKUP_VENDOR | PCI_LOOKUP_DEVICE, vendor, device);
-
-	return ret;
-}
-
-void end_pci_access(void)
-{
-	if (pci_access)
-		pci_free_name_list(pci_access);
-}
-
-#else
-
-char *pci_id_to_name(uint16_t vendor, uint16_t device, char *buffer, int len)
-{
-	return NULL;
-}
-
-void end_pci_access(void)
-{
-}
-
-#endif /* HAVE_NO_PCI */
 
 int utf_ok = -1;
 
